@@ -195,7 +195,7 @@ type SingleAutocompleteProps<T extends Item> = {
   onUpdate?: (id: T['id'], value: string) => void;
   strict?: boolean;
   onSelect: (id: T['id'], value: string) => void;
-  tableBehavior?: boolean;
+  clearOnBlur?: boolean;
   closeOnBlur?: boolean;
   value: null | T | T['id'];
   isMulti?: boolean;
@@ -220,7 +220,7 @@ function SingleAutocomplete<T extends Item>({
   onUpdate,
   strict,
   onSelect,
-  tableBehavior,
+  clearOnBlur = true,
   closeOnBlur = true,
   value: initialValue,
   isMulti = false,
@@ -363,7 +363,7 @@ function SingleAutocomplete<T extends Item>({
       }}
       onStateChange={changes => {
         if (
-          tableBehavior &&
+          !clearOnBlur &&
           changes.type === Downshift.stateChangeTypes.mouseUp
         ) {
           return;
@@ -432,7 +432,7 @@ function SingleAutocomplete<T extends Item>({
 
                 if (!closeOnBlur) return;
 
-                if (!tableBehavior) {
+                if (clearOnBlur) {
                   if (e.target.value === '') {
                     onSelect?.(null, e.target.value);
                     setSelectedItem(null);

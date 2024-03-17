@@ -85,7 +85,7 @@ export function GenericInput({
               multi={multi}
               openOnFocus={true}
               onSelect={onChange}
-              showHiddenItems={false}
+              showHiddenCategories={false}
               inputProps={{
                 inputRef,
                 ...(showPlaceholder ? { placeholder: 'nothing' } : null),

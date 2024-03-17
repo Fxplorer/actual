@@ -115,7 +115,7 @@ function CategoryList({
   );
 }
 
-type CategoryAutocompleteProps = ComponentProps<
+export type CategoryAutocompleteProps = ComponentProps<
   typeof Autocomplete<CategoryGroupEntity>
 > & {
   categoryGroups: Array<CategoryGroupEntity>;
@@ -125,7 +125,7 @@ type CategoryAutocompleteProps = ComponentProps<
   ) => ReactNode;
   renderCategoryItemGroupHeader?: (props: ItemHeaderProps) => ReactNode;
   renderCategoryItem?: (props: CategoryItemProps) => ReactNode;
-  showHiddenItems?: boolean;
+  showHiddenCategories?: boolean;
 };
 
 export function CategoryAutocomplete({
@@ -136,7 +136,7 @@ export function CategoryAutocomplete({
   renderSplitTransactionButton,
   renderCategoryItemGroupHeader,
   renderCategoryItem,
-  showHiddenItems,
+  showHiddenCategories,
   ...props
 }: CategoryAutocompleteProps) {
   const categorySuggestions: Array<
@@ -190,7 +190,7 @@ export function CategoryAutocomplete({
           renderSplitTransactionButton={renderSplitTransactionButton}
           renderCategoryItemGroupHeader={renderCategoryItemGroupHeader}
           renderCategoryItem={renderCategoryItem}
-          showHiddenItems={showHiddenItems}
+          showHiddenItems={showHiddenCategories}
         />
       )}
       {...props}

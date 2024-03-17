@@ -152,12 +152,12 @@ function PayeeList({
   );
 }
 
-type PayeeAutocompleteProps = {
+export type PayeeAutocompleteProps = {
   value: ComponentProps<typeof Autocomplete>['value'];
   inputProps: ComponentProps<typeof Autocomplete>['inputProps'];
   showMakeTransfer?: boolean;
   showManagePayees?: boolean;
-  tableBehavior: ComponentProps<typeof Autocomplete>['tableBehavior'];
+  clearOnBlur: ComponentProps<typeof Autocomplete>['clearOnBlur'];
   embedded?: boolean;
   closeOnBlur: ComponentProps<typeof Autocomplete>['closeOnBlur'];
   onUpdate?: (value: string) => void;
@@ -175,7 +175,7 @@ export function PayeeAutocomplete({
   inputProps,
   showMakeTransfer = true,
   showManagePayees = false,
-  tableBehavior,
+  clearOnBlur,
   embedded,
   closeOnBlur,
   onUpdate,
@@ -217,7 +217,7 @@ export function PayeeAutocomplete({
   const dispatch = useDispatch();
 
   async function handleSelect(value, rawInputValue) {
-    if (tableBehavior) {
+    if (!clearOnBlur) {
       onSelect?.(makeNew(value, rawInputValue));
     } else {
       const create = () => dispatch(createPayee(rawInputValue));
@@ -242,7 +242,7 @@ export function PayeeAutocomplete({
       embedded={embedded}
       value={stripNew(value)}
       suggestions={payeeSuggestions}
-      tableBehavior={tableBehavior}
+      clearOnBlur={clearOnBlur}
       closeOnBlur={closeOnBlur}
       itemToString={item => {
         if (!item) {

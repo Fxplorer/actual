@@ -521,7 +521,7 @@ function PayeeCell({
               style: inputStyle,
             }}
             showManagePayees={true}
-            tableBehavior={true}
+            clearOnBlur={false}
             focused={true}
             onUpdate={onUpdate}
             onSelect={onSave}
@@ -962,7 +962,7 @@ const Transaction = memo(function Transaction(props) {
               value={accountId}
               accounts={accounts}
               shouldSaveFromKey={shouldSaveFromKey}
-              tableBehavior={true}
+              clearOnBlur={false}
               focused={true}
               inputProps={{ onBlur, onKeyDown, style: inputStyle }}
               onUpdate={onUpdate}
@@ -1176,14 +1176,14 @@ const Transaction = memo(function Transaction(props) {
               categoryGroups={categoryGroups}
               value={categoryId}
               focused={true}
-              tableBehavior={true}
+              clearOnBlur={false}
               showSplitOption={!isChild && !isParent}
               shouldSaveFromKey={shouldSaveFromKey}
               inputProps={{ onBlur, onKeyDown, style: inputStyle }}
               onUpdate={onUpdate}
               onSelect={onSave}
               menuPortalTarget={undefined}
-              showHiddenItems={false}
+              showHiddenCategories={false}
             />
           )}
         </CustomCell>
