@@ -526,7 +526,6 @@ function PayeeCell({
             onUpdate={onUpdate}
             onSelect={onSave}
             onManagePayees={() => onManagePayees(payeeId)}
-            isCreatable
             menuPortalTarget={undefined}
           />
         );

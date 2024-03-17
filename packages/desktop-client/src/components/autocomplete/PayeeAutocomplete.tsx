@@ -168,7 +168,7 @@ export type PayeeAutocompleteProps = {
   renderPayeeItem?: (props: PayeeItemProps) => ReactNode;
   accounts?: AccountEntity[];
   payees?: PayeeEntity[];
-};
+} & ComponentProps<typeof Autocomplete>;
 
 export function PayeeAutocomplete({
   value,
