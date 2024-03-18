@@ -152,23 +152,19 @@ function PayeeList({
   );
 }
 
-export type PayeeAutocompleteProps = {
-  value: ComponentProps<typeof Autocomplete>['value'];
-  inputProps: ComponentProps<typeof Autocomplete>['inputProps'];
+type PayeeAutocompleteProps = ComponentProps<typeof Autocomplete> & {
   showMakeTransfer?: boolean;
   showManagePayees?: boolean;
-  clearOnBlur: ComponentProps<typeof Autocomplete>['clearOnBlur'];
   embedded?: boolean;
-  closeOnBlur: ComponentProps<typeof Autocomplete>['closeOnBlur'];
   onUpdate?: (value: string) => void;
   onSelect?: (value: string) => void;
-  onManagePayees: () => void;
+  onManagePayees?: () => void;
   renderCreatePayeeButton?: (props: CreatePayeeButtonProps) => ReactNode;
   renderPayeeItemGroupHeader?: (props: ItemHeaderProps) => ReactNode;
   renderPayeeItem?: (props: PayeeItemProps) => ReactNode;
   accounts?: AccountEntity[];
   payees?: PayeeEntity[];
-} & ComponentProps<typeof Autocomplete>;
+};
 
 export function PayeeAutocomplete({
   value,

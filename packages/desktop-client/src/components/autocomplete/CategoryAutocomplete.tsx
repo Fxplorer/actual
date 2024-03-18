@@ -115,7 +115,7 @@ function CategoryList({
   );
 }
 
-export type CategoryAutocompleteProps = ComponentProps<
+type CategoryAutocompleteProps = ComponentProps<
   typeof Autocomplete<CategoryGroupEntity>
 > & {
   categoryGroups: Array<CategoryGroupEntity>;

@@ -69,9 +69,9 @@ function AccountList({
   );
 }
 
-export type AccountAutocompleteProps = {
+type AccountAutocompleteProps = {
   embedded?: boolean;
-  includeClosedAccounts: boolean;
+  includeClosedAccounts?: boolean;
   renderAccountItemGroupHeader?: (props: ItemHeaderProps) => ReactNode;
   renderAccountItem?: (props: AccountItemProps) => ReactNode;
   closeOnBlur?: boolean;
