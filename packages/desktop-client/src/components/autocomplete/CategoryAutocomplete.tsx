@@ -5,6 +5,8 @@ import React, {
   type ReactNode,
   type SVGProps,
   type ComponentType,
+  type ComponentPropsWithoutRef,
+  type ReactElement,
 } from 'react';
 
 import { css } from 'glamor';
@@ -21,21 +23,25 @@ import { Text } from '../common/Text';
 import { View } from '../common/View';
 
 import { Autocomplete, defaultFilterSuggestion } from './Autocomplete';
-import { ItemHeader, type ItemHeaderProps } from './ItemHeader';
+import { ItemHeader } from './ItemHeader';
 
 export type CategoryListProps = {
-  items: Array<CategoryEntity & { group?: CategoryGroupEntity }>;
+  items: CategoryAutocompleteItem[];
   getItemProps?: (arg: {
-    item: CategoryEntity;
+    item: CategoryAutocompleteItem;
   }) => Partial<ComponentProps<typeof View>>;
   highlightedIndex: number;
   embedded?: boolean;
   footer?: ReactNode;
   renderSplitTransactionButton?: (
-    props: SplitTransactionButtonProps,
-  ) => ReactNode;
-  renderCategoryItemGroupHeader?: (props: ItemHeaderProps) => ReactNode;
-  renderCategoryItem?: (props: CategoryItemProps) => ReactNode;
+    props: ComponentPropsWithoutRef<typeof SplitTransactionButton>,
+  ) => ReactElement<typeof SplitTransactionButton>;
+  renderCategoryItemGroupHeader?: (
+    props: ComponentPropsWithoutRef<typeof ItemHeader>,
+  ) => ReactElement<typeof ItemHeader>;
+  renderCategoryItem?: (
+    props: ComponentPropsWithoutRef<typeof CategoryItem>,
+  ) => ReactElement<typeof CategoryItem>;
   showHiddenItems?: boolean;
 };
 function CategoryList({
@@ -115,16 +121,24 @@ function CategoryList({
   );
 }
 
+type CategoryAutocompleteItem = CategoryEntity & {
+  group?: CategoryGroupEntity;
+};
+
 type CategoryAutocompleteProps = ComponentProps<
-  typeof Autocomplete<CategoryGroupEntity>
+  typeof Autocomplete<CategoryAutocompleteItem>
 > & {
   categoryGroups: Array<CategoryGroupEntity>;
   showSplitOption?: boolean;
   renderSplitTransactionButton?: (
-    props: SplitTransactionButtonProps,
-  ) => ReactNode;
-  renderCategoryItemGroupHeader?: (props: ItemHeaderProps) => ReactNode;
-  renderCategoryItem?: (props: CategoryItemProps) => ReactNode;
+    props: ComponentPropsWithoutRef<typeof SplitTransactionButton>,
+  ) => ReactElement<typeof SplitTransactionButton>;
+  renderCategoryItemGroupHeader?: (
+    props: ComponentPropsWithoutRef<typeof ItemHeader>,
+  ) => ReactElement<typeof ItemHeader>;
+  renderCategoryItem?: (
+    props: ComponentPropsWithoutRef<typeof CategoryItem>,
+  ) => ReactElement<typeof CategoryItem>;
   showHiddenCategories?: boolean;
 };
 
@@ -139,9 +153,7 @@ export function CategoryAutocomplete({
   showHiddenCategories,
   ...props
 }: CategoryAutocompleteProps) {
-  const categorySuggestions: Array<
-    CategoryEntity & { group?: CategoryGroupEntity }
-  > = useMemo(
+  const categorySuggestions: CategoryAutocompleteItem[] = useMemo(
     () =>
       categoryGroups.reduce(
         (list, group) =>
@@ -159,7 +171,7 @@ export function CategoryAutocomplete({
   );
 
   return (
-    <Autocomplete
+    <Autocomplete<CategoryAutocompleteItem>
       strict={true}
       highlightFirst={true}
       embedded={embedded}
@@ -198,7 +210,9 @@ export function CategoryAutocomplete({
   );
 }
 
-function defaultRenderCategoryItemGroupHeader(props: ItemHeaderProps) {
+function defaultRenderCategoryItemGroupHeader(
+  props: ComponentPropsWithoutRef<typeof ItemHeader>,
+): ReactElement<typeof ItemHeader> {
   return <ItemHeader {...props} type="category" />;
 }
 
@@ -277,12 +291,12 @@ function SplitTransactionButton({
 
 function defaultRenderSplitTransactionButton(
   props: SplitTransactionButtonProps,
-) {
+): ReactElement<typeof SplitTransactionButton> {
   return <SplitTransactionButton {...props} />;
 }
 
 type CategoryItemProps = {
-  item: CategoryEntity & { group?: CategoryGroupEntity };
+  item: CategoryAutocompleteItem;
   className?: string;
   style?: CSSProperties;
   highlighted?: boolean;
@@ -325,6 +339,8 @@ export function CategoryItem({
   );
 }
 
-function defaultRenderCategoryItem(props: CategoryItemProps) {
+function defaultRenderCategoryItem(
+  props: ComponentPropsWithoutRef<typeof CategoryItem>,
+): ReactElement<typeof CategoryItem> {
   return <CategoryItem {...props} />;
 }

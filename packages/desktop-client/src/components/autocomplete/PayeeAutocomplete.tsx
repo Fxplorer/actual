@@ -7,6 +7,8 @@ import React, {
   type ReactNode,
   type ComponentType,
   type SVGProps,
+  type ComponentPropsWithoutRef,
+  type ReactElement,
 } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -32,9 +34,13 @@ import {
   defaultFilterSuggestion,
   AutocompleteFooter,
 } from './Autocomplete';
-import { ItemHeader, type ItemHeaderProps } from './ItemHeader';
+import { ItemHeader } from './ItemHeader';
 
-function getPayeeSuggestions(payees, focusTransferPayees, accounts) {
+function getPayeeSuggestions(
+  payees: PayeeEntity[],
+  focusTransferPayees: boolean,
+  accounts: AccountEntity[],
+): PayeeEntity[] {
   let activePayees = accounts ? getActivePayees(payees, accounts) : payees;
 
   if (focusTransferPayees && activePayees) {
@@ -60,6 +66,24 @@ function stripNew(value) {
   return value;
 }
 
+type PayeeListProps = {
+  items: PayeeEntity[];
+  getItemProps: (arg: { item: PayeeEntity }) => ComponentProps<typeof View>;
+  highlightedIndex: number;
+  embedded: boolean;
+  inputValue: string;
+  renderCreatePayeeButton?: (
+    props: ComponentPropsWithoutRef<typeof CreatePayeeButton>,
+  ) => ReactNode;
+  renderPayeeItemGroupHeader?: (
+    props: ComponentPropsWithoutRef<typeof ItemHeader>,
+  ) => ReactNode;
+  renderPayeeItem?: (
+    props: ComponentPropsWithoutRef<typeof PayeeItem>,
+  ) => ReactNode;
+  footer: ReactNode;
+};
+
 function PayeeList({
   items,
   getItemProps,
@@ -70,8 +94,7 @@ function PayeeList({
   renderPayeeItemGroupHeader = defaultRenderPayeeItemGroupHeader,
   renderPayeeItem = defaultRenderPayeeItem,
   footer,
-}) {
-  const isFiltered = items.filtered;
+}: PayeeListProps) {
   let createNew = null;
   items = [...items];
 
@@ -112,7 +135,8 @@ function PayeeList({
           } else if (type === 'account' && lastType !== type) {
             title = 'Transfer To/From';
           }
-          const showMoreMessage = idx === items.length - 1 && isFiltered;
+          const showMoreMessage =
+            idx === items.length - 1 && items.length > 100;
           lastType = type;
 
           return (
@@ -152,16 +176,24 @@ function PayeeList({
   );
 }
 
-type PayeeAutocompleteProps = ComponentProps<typeof Autocomplete> & {
+type PayeeAutocompleteProps = ComponentProps<
+  typeof Autocomplete<PayeeEntity>
+> & {
   showMakeTransfer?: boolean;
   showManagePayees?: boolean;
   embedded?: boolean;
   onUpdate?: (value: string) => void;
   onSelect?: (value: string) => void;
   onManagePayees?: () => void;
-  renderCreatePayeeButton?: (props: CreatePayeeButtonProps) => ReactNode;
-  renderPayeeItemGroupHeader?: (props: ItemHeaderProps) => ReactNode;
-  renderPayeeItem?: (props: PayeeItemProps) => ReactNode;
+  renderCreatePayeeButton?: (
+    props: ComponentPropsWithoutRef<typeof CreatePayeeButton>,
+  ) => ReactElement<typeof CreatePayeeButton>;
+  renderPayeeItemGroupHeader?: (
+    props: ComponentPropsWithoutRef<typeof ItemHeader>,
+  ) => ReactElement<typeof ItemHeader>;
+  renderPayeeItem?: (
+    props: ComponentPropsWithoutRef<typeof PayeeItem>,
+  ) => ReactElement<typeof PayeeItem>;
   accounts?: AccountEntity[];
   payees?: PayeeEntity[];
 };
@@ -197,7 +229,7 @@ export function PayeeAutocomplete({
   const [focusTransferPayees, setFocusTransferPayees] = useState(false);
   const [rawPayee, setRawPayee] = useState('');
   const hasPayeeInput = !!rawPayee;
-  const payeeSuggestions = useMemo(() => {
+  const payeeSuggestions: PayeeEntity[] = useMemo(() => {
     const suggestions = getPayeeSuggestions(
       payees,
       focusTransferPayees,
@@ -232,7 +264,7 @@ export function PayeeAutocomplete({
   const [payeeFieldFocused, setPayeeFieldFocused] = useState(false);
 
   return (
-    <Autocomplete
+    <Autocomplete<PayeeEntity>
       key={focusTransferPayees ? 'transfers' : 'all'}
       strict={true}
       embedded={embedded}
@@ -305,10 +337,7 @@ export function PayeeAutocomplete({
           }
         });
 
-        const isf = filtered.length > 100;
         filtered = filtered.slice(0, 100);
-        // @ts-expect-error TODO: solve this somehow
-        filtered.filtered = isf;
 
         if (filtered.length >= 2 && filtered[0].id === 'new') {
           if (
@@ -414,12 +443,14 @@ export function CreatePayeeButton({
 }
 
 function defaultRenderCreatePayeeButton(
-  props: CreatePayeeButtonProps,
-): ReactNode {
+  props: ComponentPropsWithoutRef<typeof CreatePayeeButton>,
+): ReactElement<typeof CreatePayeeButton> {
   return <CreatePayeeButton {...props} />;
 }
 
-function defaultRenderPayeeItemGroupHeader(props: ItemHeaderProps): ReactNode {
+function defaultRenderPayeeItemGroupHeader(
+  props: ComponentPropsWithoutRef<typeof ItemHeader>,
+): ReactElement<typeof ItemHeader> {
   return <ItemHeader {...props} type="payee" />;
 }
 
@@ -484,6 +515,8 @@ export function PayeeItem({
   );
 }
 
-function defaultRenderPayeeItem(props: PayeeItemProps): ReactNode {
+function defaultRenderPayeeItem(
+  props: ComponentPropsWithoutRef<typeof PayeeItem>,
+): ReactElement<typeof PayeeItem> {
   return <PayeeItem {...props} />;
 }

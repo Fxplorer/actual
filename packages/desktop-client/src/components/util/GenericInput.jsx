@@ -49,7 +49,7 @@ export function GenericInput({
         case 'payee':
           content = (
             <PayeeAutocomplete
-              multi={multi}
+              type={multi}
               showMakeTransfer={false}
               openOnFocus={true}
               value={value}
@@ -66,7 +66,7 @@ export function GenericInput({
           content = (
             <AccountAutocomplete
               value={value}
-              multi={multi}
+              type={multi}
               openOnFocus={true}
               onSelect={onChange}
               inputProps={{
@@ -82,7 +82,7 @@ export function GenericInput({
             <CategoryAutocomplete
               categoryGroups={categoryGroups}
               value={value}
-              multi={multi}
+              type={multi}
               openOnFocus={true}
               onSelect={onChange}
               showHiddenCategories={false}
@@ -105,7 +105,7 @@ export function GenericInput({
             <FilterAutocomplete
               saved={saved}
               value={value}
-              multi={multi}
+              type={multi}
               openOnFocus={true}
               onSelect={onChange}
               inputProps={{
@@ -120,7 +120,7 @@ export function GenericInput({
             <ReportAutocomplete
               saved={savedReports}
               value={value}
-              multi={multi}
+              type={multi}
               openOnFocus={true}
               onSelect={onChange}
               inputProps={{
@@ -200,7 +200,7 @@ export function GenericInput({
       if (multi) {
         content = (
           <Autocomplete
-            multi={true}
+            type={true}
             suggestions={[]}
             value={value}
             inputProps={{ inputRef }}

@@ -21,6 +21,37 @@ import { Input } from '../common/Input';
 import { View } from '../common/View';
 import { Tooltip } from '../tooltips';
 
+type CommonAutocompleteProps<T extends Item> = {
+  focused?: boolean;
+  embedded?: boolean;
+  containerProps?: HTMLProps<HTMLDivElement>;
+  labelProps?: { id?: string };
+  inputProps?: Omit<ComponentProps<typeof Input>, 'onChange'> & {
+    onChange?: (value: string) => void;
+  };
+  suggestions?: T[];
+  tooltipStyle?: CSSProperties;
+  tooltipProps?: ComponentProps<typeof Tooltip>;
+  renderInput?: (props: ComponentProps<typeof Input>) => ReactNode;
+  renderItems?: (
+    items: T[],
+    getItemProps: (arg: { item: T }) => ComponentProps<typeof View>,
+    idx: number,
+    value?: string,
+  ) => ReactNode;
+  itemToString?: (item: T) => string;
+  shouldSaveFromKey?: (e: KeyboardEvent) => boolean;
+  filterSuggestions?: (suggestions: T[], value: string) => T[];
+  openOnFocus?: boolean;
+  getHighlightedIndex?: (suggestions: T[]) => number | null;
+  highlightFirst?: boolean;
+  onUpdate?: (id: T['id'], value: string) => void;
+  strict?: boolean;
+  clearOnBlur?: boolean;
+  clearOnSelect?: boolean;
+  closeOnBlur?: boolean;
+};
+
 type Item = {
   id?: string;
   name: string;
@@ -41,7 +72,7 @@ function findItem<T extends Item>(
   return value;
 }
 
-function getItemName(item: null | string | Item): string {
+function getItemName<T extends Item>(item: T | T['name']): string {
   if (item == null) {
     return '';
   } else if (typeof item === 'string') {
@@ -50,7 +81,7 @@ function getItemName(item: null | string | Item): string {
   return item.name || '';
 }
 
-function getItemId(item: Item | Item['id']) {
+function getItemId<T extends Item>(item: T | T['id']) {
   if (typeof item === 'string') {
     return item;
   }
@@ -168,38 +199,12 @@ function defaultItemToString<T extends Item>(item?: T) {
   return item ? getItemName(item) : '';
 }
 
-type SingleAutocompleteProps<T extends Item> = {
-  focused?: boolean;
-  embedded?: boolean;
-  containerProps?: HTMLProps<HTMLDivElement>;
-  labelProps?: { id?: string };
-  inputProps?: Omit<ComponentProps<typeof Input>, 'onChange'> & {
-    onChange?: (value: string) => void;
-  };
-  suggestions?: T[];
-  tooltipStyle?: CSSProperties;
-  tooltipProps?: ComponentProps<typeof Tooltip>;
-  renderInput?: (props: ComponentProps<typeof Input>) => ReactNode;
-  renderItems?: (
-    items: T[],
-    getItemProps: (arg: { item: T }) => ComponentProps<typeof View>,
-    idx: number,
-    value?: string,
-  ) => ReactNode;
-  itemToString?: (item: T) => string;
-  shouldSaveFromKey?: (e: KeyboardEvent) => boolean;
-  filterSuggestions?: (suggestions: T[], value: string) => T[];
-  openOnFocus?: boolean;
-  getHighlightedIndex?: (suggestions: T[]) => number | null;
-  highlightFirst?: boolean;
-  onUpdate?: (id: T['id'], value: string) => void;
-  strict?: boolean;
+type SingleAutocompleteProps<T extends Item> = CommonAutocompleteProps<T> & {
+  type?: 'single' | undefined;
   onSelect: (id: T['id'], value: string) => void;
-  clearOnBlur?: boolean;
-  closeOnBlur?: boolean;
   value: null | T | T['id'];
-  isMulti?: boolean;
 };
+
 function SingleAutocomplete<T extends Item>({
   focused,
   embedded = false,
@@ -221,9 +226,9 @@ function SingleAutocomplete<T extends Item>({
   strict,
   onSelect,
   clearOnBlur = true,
+  clearOnSelect = false,
   closeOnBlur = true,
   value: initialValue,
-  isMulti = false,
 }: SingleAutocompleteProps<T>) {
   const [selectedItem, setSelectedItem] = useState(() =>
     findItem(strict, suggestions, initialValue),
@@ -273,7 +278,7 @@ function SingleAutocomplete<T extends Item>({
         setSelectedItem(item);
         setHighlightedIndex(null);
 
-        if (isMulti) {
+        if (clearOnSelect) {
           setValue('');
         } else {
           setIsOpen(false);
@@ -579,13 +584,12 @@ function MultiItem({ name, onRemove }: MultiItemProps) {
   );
 }
 
-type MultiAutocompleteProps<
-  T extends Item,
-  Value = SingleAutocompleteProps<T>['value'],
-> = Omit<SingleAutocompleteProps<T>, 'value' | 'onSelect'> & {
-  value: Value[];
-  onSelect: (ids: Value[], id?: string) => void;
+type MultiAutocompleteProps<T extends Item> = CommonAutocompleteProps<T> & {
+  type: 'multi';
+  onSelect: (ids: T['id'][], id?: T['id']) => void;
+  value: null | T[] | T['id'][];
 };
+
 function MultiAutocomplete<T extends Item>({
   value: selectedItems,
   onSelect,
@@ -600,15 +604,15 @@ function MultiAutocomplete<T extends Item>({
     lastSelectedItems.current = selectedItems;
   });
 
-  function onRemoveItem(id: (typeof selectedItems)[0]) {
-    const items = selectedItems.filter(i => i !== id);
+  function onRemoveItem(id: T['id']) {
+    const items = selectedItems.map(getItemId).filter(i => i !== id);
     onSelect(items);
   }
 
-  function onAddItem(id: string) {
+  function onAddItem(id: T['id']) {
     if (id) {
       id = id.trim();
-      onSelect([...selectedItems, id], id);
+      onSelect([...selectedItems.map(getItemId), id], id);
     }
   }
 
@@ -617,7 +621,7 @@ function MultiAutocomplete<T extends Item>({
     prevOnKeyDown?: ComponentProps<typeof Input>['onKeyDown'],
   ) {
     if (e.key === 'Backspace' && e.currentTarget.value === '') {
-      onRemoveItem(selectedItems[selectedItems.length - 1]);
+      onRemoveItem(selectedItems.map(getItemId)[selectedItems.length - 1]);
     }
 
     prevOnKeyDown?.(e);
@@ -626,10 +630,11 @@ function MultiAutocomplete<T extends Item>({
   return (
     <Autocomplete
       {...props}
-      isMulti
+      type="single"
       value={null}
+      clearOnSelect={true}
       suggestions={suggestions.filter(
-        item => !selectedItems.includes(getItemId(item)),
+        item => !selectedItems.map(getItemId).includes(getItemId(item)),
       )}
       onSelect={onAddItem}
       highlightFirst
@@ -721,18 +726,10 @@ type AutocompleteProps<T extends Item> =
   | ComponentProps<typeof SingleAutocomplete<T>>
   | ComponentProps<typeof MultiAutocomplete<T>>;
 
-function isMultiAutocomplete<T extends Item>(
-  _props: AutocompleteProps<T>,
-  multi?: boolean,
-): _props is ComponentProps<typeof MultiAutocomplete<T>> {
-  return multi;
-}
-
 export function Autocomplete<T extends Item>({
-  multi,
   ...props
-}: AutocompleteProps<T> & { multi?: boolean }) {
-  if (isMultiAutocomplete(props, multi)) {
+}: AutocompleteProps<T>) {
+  if (props.type === 'multi') {
     return <MultiAutocomplete {...props} />;
   }
 

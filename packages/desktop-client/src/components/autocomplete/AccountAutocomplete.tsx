@@ -1,5 +1,11 @@
 // @ts-strict-ignore
-import React, { Fragment, type ComponentProps, type ReactNode } from 'react';
+import React, {
+  Fragment,
+  type ComponentProps,
+  type ReactNode,
+  type ComponentPropsWithoutRef,
+  type ReactElement,
+} from 'react';
 
 import { css } from 'glamor';
 
@@ -11,7 +17,20 @@ import { type CSSProperties, theme } from '../../style';
 import { View } from '../common/View';
 
 import { Autocomplete } from './Autocomplete';
-import { ItemHeader, type ItemHeaderProps } from './ItemHeader';
+import { ItemHeader } from './ItemHeader';
+
+type AccountListProps = {
+  items: AccountEntity[];
+  getItemProps: (arg: { item: AccountEntity }) => ComponentProps<typeof View>;
+  highlightedIndex: number;
+  embedded: boolean;
+  renderAccountItemGroupHeader?: (
+    props: ComponentPropsWithoutRef<typeof ItemHeader>,
+  ) => ReactElement<typeof ItemHeader>;
+  renderAccountItem?: (
+    props: ComponentPropsWithoutRef<typeof AccountItem>,
+  ) => ReactElement<typeof AccountItem>;
+};
 
 function AccountList({
   items,
@@ -20,7 +39,7 @@ function AccountList({
   embedded,
   renderAccountItemGroupHeader = defaultRenderAccountItemGroupHeader,
   renderAccountItem = defaultRenderAccountItem,
-}) {
+}: AccountListProps) {
   let lastItem = null;
 
   return (
@@ -69,13 +88,19 @@ function AccountList({
   );
 }
 
-type AccountAutocompleteProps = {
+type AccountAutocompleteProps = ComponentProps<
+  typeof Autocomplete<AccountEntity>
+> & {
   embedded?: boolean;
   includeClosedAccounts?: boolean;
-  renderAccountItemGroupHeader?: (props: ItemHeaderProps) => ReactNode;
-  renderAccountItem?: (props: AccountItemProps) => ReactNode;
+  renderAccountItemGroupHeader?: (
+    props: ComponentPropsWithoutRef<typeof ItemHeader>,
+  ) => ReactElement<typeof ItemHeader>;
+  renderAccountItem?: (
+    props: ComponentPropsWithoutRef<typeof AccountItem>,
+  ) => ReactElement<typeof AccountItem>;
   closeOnBlur?: boolean;
-} & ComponentProps<typeof Autocomplete>;
+};
 
 export function AccountAutocomplete({
   embedded,
@@ -85,11 +110,11 @@ export function AccountAutocomplete({
   closeOnBlur,
   ...props
 }: AccountAutocompleteProps) {
-  let accounts = useAccounts() || [];
+  const accounts = useAccounts() || [];
 
   //remove closed accounts if needed
   //then sort by closed, then offbudget
-  accounts = accounts
+  const accountSuggestions: AccountEntity[] = accounts
     .filter(item => {
       return includeClosedAccounts ? item : !item.closed;
     })
@@ -102,12 +127,12 @@ export function AccountAutocomplete({
     });
 
   return (
-    <Autocomplete
+    <Autocomplete<AccountEntity>
       strict={true}
       highlightFirst={true}
       embedded={embedded}
       closeOnBlur={closeOnBlur}
-      suggestions={accounts}
+      suggestions={accountSuggestions}
       renderItems={(items, getItemProps, highlightedIndex) => (
         <AccountList
           items={items}
@@ -124,8 +149,8 @@ export function AccountAutocomplete({
 }
 
 function defaultRenderAccountItemGroupHeader(
-  props: ItemHeaderProps,
-): ReactNode {
+  props: ComponentPropsWithoutRef<typeof ItemHeader>,
+): ReactElement<typeof ItemHeader> {
   return <ItemHeader {...props} type="account" />;
 }
 
@@ -191,6 +216,8 @@ export function AccountItem({
   );
 }
 
-function defaultRenderAccountItem(props: AccountItemProps): ReactNode {
+function defaultRenderAccountItem(
+  props: ComponentPropsWithoutRef<typeof AccountItem>,
+): ReactElement<typeof AccountItem> {
   return <AccountItem {...props} />;
 }
