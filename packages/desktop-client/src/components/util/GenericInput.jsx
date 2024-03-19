@@ -41,6 +41,7 @@ export function GenericInput({
   }
 
   const showPlaceholder = multi ? value.length === 0 : true;
+  const autocompleteType = multi ? 'multi' : 'single';
 
   let content;
   switch (type) {
@@ -49,7 +50,7 @@ export function GenericInput({
         case 'payee':
           content = (
             <PayeeAutocomplete
-              type={multi}
+              type={autocompleteType}
               showMakeTransfer={false}
               openOnFocus={true}
               value={value}
@@ -65,8 +66,8 @@ export function GenericInput({
         case 'account':
           content = (
             <AccountAutocomplete
+              type={autocompleteType}
               value={value}
-              type={multi}
               openOnFocus={true}
               onSelect={onChange}
               inputProps={{
@@ -80,9 +81,9 @@ export function GenericInput({
         case 'category':
           content = (
             <CategoryAutocomplete
+              type={autocompleteType}
               categoryGroups={categoryGroups}
               value={value}
-              type={multi}
               openOnFocus={true}
               onSelect={onChange}
               showHiddenCategories={false}
@@ -103,9 +104,9 @@ export function GenericInput({
         case 'saved':
           content = (
             <FilterAutocomplete
+              type={autocompleteType}
               saved={saved}
               value={value}
-              type={multi}
               openOnFocus={true}
               onSelect={onChange}
               inputProps={{
@@ -118,9 +119,9 @@ export function GenericInput({
         case 'report':
           content = (
             <ReportAutocomplete
+              type={autocompleteType}
               saved={savedReports}
               value={value}
-              type={multi}
               openOnFocus={true}
               onSelect={onChange}
               inputProps={{
@@ -200,7 +201,7 @@ export function GenericInput({
       if (multi) {
         content = (
           <Autocomplete
-            type={true}
+            type="multi"
             suggestions={[]}
             value={value}
             inputProps={{ inputRef }}
