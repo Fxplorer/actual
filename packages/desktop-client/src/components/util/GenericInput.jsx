@@ -201,7 +201,7 @@ export function GenericInput({
       if (multi) {
         content = (
           <Autocomplete
-            type="multi"
+            type={autocompleteType}
             suggestions={[]}
             value={value}
             inputProps={{ inputRef }}

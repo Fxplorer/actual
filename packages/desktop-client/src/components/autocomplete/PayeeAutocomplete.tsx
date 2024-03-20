@@ -50,11 +50,11 @@ function getPayeeSuggestions(
   return activePayees || [];
 }
 
-function makeNew(value, rawPayee) {
-  if (value === 'new' && !rawPayee.startsWith('new:')) {
+function makeNew(id, rawPayee) {
+  if (id === 'new' && !rawPayee.startsWith('new:')) {
     return 'new:' + rawPayee;
   }
-  return value;
+  return id;
 }
 
 // Convert the fully resolved new value into the 'new' id that can be
@@ -182,8 +182,6 @@ type PayeeAutocompleteProps = ComponentProps<
   showMakeTransfer?: boolean;
   showManagePayees?: boolean;
   embedded?: boolean;
-  onUpdate?: (value: string) => void;
-  onSelect?: (value: string) => void;
   onManagePayees?: () => void;
   renderCreatePayeeButton?: (
     props: ComponentPropsWithoutRef<typeof CreatePayeeButton>,
@@ -203,9 +201,9 @@ export function PayeeAutocomplete({
   inputProps,
   showMakeTransfer = true,
   showManagePayees = false,
-  clearOnBlur,
-  embedded,
+  clearOnBlur = true,
   closeOnBlur,
+  embedded,
   onUpdate,
   onSelect,
   onManagePayees,
@@ -244,20 +242,22 @@ export function PayeeAutocomplete({
 
   const dispatch = useDispatch();
 
-  async function handleSelect(value, rawInputValue) {
+  async function handleSelect(idOrIds, rawInputValue) {
     if (!clearOnBlur) {
-      onSelect?.(makeNew(value, rawInputValue));
+      onSelect?.(makeNew(idOrIds, rawInputValue), rawInputValue);
     } else {
-      const create = () => dispatch(createPayee(rawInputValue));
+      const create = payeeName => dispatch(createPayee(payeeName));
 
-      if (Array.isArray(value)) {
-        value = await Promise.all(value.map(v => (v === 'new' ? create() : v)));
+      if (Array.isArray(idOrIds)) {
+        idOrIds = await Promise.all(
+          idOrIds.map(v => (v === 'new' ? create(rawInputValue) : v)),
+        );
       } else {
-        if (value === 'new') {
-          value = await create();
+        if (idOrIds === 'new') {
+          idOrIds = await create(rawInputValue);
         }
       }
-      onSelect?.(value);
+      onSelect?.(idOrIds, rawInputValue);
     }
   }
 
@@ -290,9 +290,7 @@ export function PayeeAutocomplete({
         onFocus: () => setPayeeFieldFocused(true),
         onChange: setRawPayee,
       }}
-      onUpdate={(value, inputValue) =>
-        onUpdate && onUpdate(makeNew(value, inputValue))
-      }
+      onUpdate={(id, inputValue) => onUpdate?.(id, makeNew(id, inputValue))}
       onSelect={handleSelect}
       getHighlightedIndex={suggestions => {
         if (suggestions.length > 1 && suggestions[0].id === 'new') {
@@ -366,7 +364,7 @@ export function PayeeAutocomplete({
                   type={focusTransferPayees ? 'menuSelected' : 'menu'}
                   style={showManagePayees && { marginBottom: 5 }}
                   onClick={() => {
-                    onUpdate?.(null);
+                    onUpdate?.(null, null);
                     setFocusTransferPayees(!focusTransferPayees);
                   }}
                 >

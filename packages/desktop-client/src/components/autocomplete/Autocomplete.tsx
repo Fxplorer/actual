@@ -200,7 +200,7 @@ function defaultItemToString<T extends Item>(item?: T) {
 }
 
 type SingleAutocompleteProps<T extends Item> = CommonAutocompleteProps<T> & {
-  type?: 'single' | undefined;
+  type?: 'single' | never;
   onSelect: (id: T['id'], value: string) => void;
   value: null | T | T['id'];
 };
@@ -595,24 +595,27 @@ function MultiAutocomplete<T extends Item>({
   onSelect,
   suggestions,
   strict,
+  clearOnBlur = true,
   ...props
 }: MultiAutocompleteProps<T>) {
+  selectedItems = selectedItems || [];
   const [focused, setFocused] = useState(false);
   const lastSelectedItems = useRef<typeof selectedItems>();
+  const selectedItemIds = selectedItems.map(getItemId);
 
   useEffect(() => {
     lastSelectedItems.current = selectedItems;
   });
 
   function onRemoveItem(id: T['id']) {
-    const items = selectedItems.map(getItemId).filter(i => i !== id);
+    const items = selectedItemIds.filter(i => i !== id);
     onSelect(items);
   }
 
   function onAddItem(id: T['id']) {
     if (id) {
       id = id.trim();
-      onSelect([...selectedItems.map(getItemId), id], id);
+      onSelect([...selectedItemIds, id], id);
     }
   }
 
@@ -621,7 +624,7 @@ function MultiAutocomplete<T extends Item>({
     prevOnKeyDown?: ComponentProps<typeof Input>['onKeyDown'],
   ) {
     if (e.key === 'Backspace' && e.currentTarget.value === '') {
-      onRemoveItem(selectedItems.map(getItemId)[selectedItems.length - 1]);
+      onRemoveItem(selectedItemIds[selectedItems.length - 1]);
     }
 
     prevOnKeyDown?.(e);
@@ -632,9 +635,10 @@ function MultiAutocomplete<T extends Item>({
       {...props}
       type="single"
       value={null}
+      clearOnBlur={clearOnBlur}
       clearOnSelect={true}
       suggestions={suggestions.filter(
-        item => !selectedItems.map(getItemId).includes(getItemId(item)),
+        item => !selectedItemIds.includes(getItemId(item)),
       )}
       onSelect={onAddItem}
       highlightFirst
