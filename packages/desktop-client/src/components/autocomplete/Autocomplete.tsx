@@ -50,6 +50,7 @@ type CommonAutocompleteProps<T extends Item> = {
   clearOnBlur?: boolean;
   clearOnSelect?: boolean;
   closeOnBlur?: boolean;
+  onClose?: () => void;
 };
 
 type Item = {
@@ -228,6 +229,7 @@ function SingleAutocomplete<T extends Item>({
   clearOnBlur = true,
   clearOnSelect = false,
   closeOnBlur = true,
+  onClose,
   value: initialValue,
 }: SingleAutocompleteProps<T>) {
   const [selectedItem, setSelectedItem] = useState(() =>
@@ -244,6 +246,12 @@ function SingleAutocomplete<T extends Item>({
   );
   const [highlightedIndex, setHighlightedIndex] = useState(null);
   const [isOpen, setIsOpen] = useState(embedded);
+
+  useEffect(() => {
+    if (!isOpen) {
+      onClose?.();
+    }
+  }, [isOpen, onClose]);
 
   // Update the selected item if the suggestion list or initial
   // input value has changed
