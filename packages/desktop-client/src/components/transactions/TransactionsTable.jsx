@@ -523,7 +523,7 @@ function PayeeCell({
             showManagePayees={true}
             clearOnBlur={false}
             focused={true}
-            onUpdate={onUpdate}
+            onUpdate={(id, value) => onUpdate?.(value)}
             onSelect={onSave}
             onManagePayees={() => onManagePayees(payeeId)}
             menuPortalTarget={undefined}
