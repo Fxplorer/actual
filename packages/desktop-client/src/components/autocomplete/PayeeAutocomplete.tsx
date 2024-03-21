@@ -394,6 +394,7 @@ type CreatePayeeButtonProps = {
   style?: CSSProperties;
 };
 
+// eslint-disable-next-line import/no-unused-modules
 export function CreatePayeeButton({
   Icon,
   payeeName,
@@ -469,6 +470,7 @@ type PayeeItemProps = {
   embedded?: boolean;
 };
 
+// eslint-disable-next-line import/no-unused-modules
 export function PayeeItem({
   item,
   className,
