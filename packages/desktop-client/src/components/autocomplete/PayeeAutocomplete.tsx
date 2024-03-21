@@ -27,6 +27,7 @@ import { SvgAdd } from '../../icons/v1';
 import { useResponsive } from '../../ResponsiveProvider';
 import { type CSSProperties, theme, styles } from '../../style';
 import { Button } from '../common/Button';
+import { TextOneLine } from '../common/TextOneLine';
 import { View } from '../common/View';
 
 import {
@@ -526,7 +527,7 @@ export function PayeeItem({
       data-highlighted={highlighted || undefined}
       {...props}
     >
-      {item.name}
+      <TextOneLine>{item.name}</TextOneLine>
     </div>
   );
 }

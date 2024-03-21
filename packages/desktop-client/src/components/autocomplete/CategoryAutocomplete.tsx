@@ -20,6 +20,7 @@ import { SvgSplit } from '../../icons/v0';
 import { useResponsive } from '../../ResponsiveProvider';
 import { type CSSProperties, theme, styles } from '../../style';
 import { Text } from '../common/Text';
+import { TextOneLine } from '../common/TextOneLine';
 import { View } from '../common/View';
 
 import { Autocomplete, defaultFilterSuggestion } from './Autocomplete';
@@ -343,8 +344,10 @@ export function CategoryItem({
       data-highlighted={highlighted || undefined}
       {...props}
     >
-      {item.name}
-      {item.hidden ? ' (hidden)' : null}
+      <TextOneLine>
+        {item.name}
+        {item.hidden ? ' (hidden)' : null}
+      </TextOneLine>
     </div>
   );
 }

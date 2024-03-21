@@ -14,6 +14,7 @@ import { type AccountEntity } from 'loot-core/src/types/models';
 import { useAccounts } from '../../hooks/useAccounts';
 import { useResponsive } from '../../ResponsiveProvider';
 import { type CSSProperties, theme, styles } from '../../style';
+import { TextOneLine } from '../common/TextOneLine';
 import { View } from '../common/View';
 
 import { Autocomplete } from './Autocomplete';
@@ -221,7 +222,7 @@ export function AccountItem({
       data-highlighted={highlighted || undefined}
       {...props}
     >
-      {item.name}
+      <TextOneLine>{item.name}</TextOneLine>
     </div>
   );
 }
