@@ -18,7 +18,7 @@ import {
 
 import { SvgSplit } from '../../icons/v0';
 import { useResponsive } from '../../ResponsiveProvider';
-import { type CSSProperties, theme } from '../../style';
+import { type CSSProperties, theme, styles } from '../../style';
 import { Text } from '../common/Text';
 import { View } from '../common/View';
 
@@ -312,6 +312,15 @@ export function CategoryItem({
   ...props
 }: CategoryItemProps) {
   const { isNarrowWidth } = useResponsive();
+  const narrowStyle = isNarrowWidth
+    ? {
+        ...styles.mobileMenuItem,
+        color: theme.menuItemText,
+        borderRadius: 0,
+        borderTop: `1px solid ${theme.pillBorder}`,
+      }
+    : {};
+
   return (
     <div
       style={style}
@@ -327,6 +336,7 @@ export function CategoryItem({
           padding: 4,
           paddingLeft: 20,
           borderRadius: embedded ? 4 : 0,
+          ...narrowStyle,
         },
       ])}`}
       data-testid={`${item.name}-category-item`}

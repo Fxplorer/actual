@@ -15,7 +15,8 @@ import Downshift, { type StateChangeTypes } from 'downshift';
 import { css } from 'glamor';
 
 import { SvgRemove } from '../../icons/v2';
-import { theme, type CSSProperties } from '../../style';
+import { useResponsive } from '../../ResponsiveProvider';
+import { theme, type CSSProperties, styles } from '../../style';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { View } from '../common/View';
@@ -246,6 +247,20 @@ function SingleAutocomplete<T extends Item>({
   );
   const [highlightedIndex, setHighlightedIndex] = useState(null);
   const [isOpen, setIsOpen] = useState(embedded);
+  const { isNarrowWidth } = useResponsive();
+  const narrowInputStyle = isNarrowWidth
+    ? {
+        ...styles.mobileMenuItem,
+      }
+    : {};
+
+  inputProps = {
+    ...inputProps,
+    style: {
+      ...narrowInputStyle,
+      ...inputProps.style,
+    },
+  };
 
   useEffect(() => {
     if (!isOpen) {

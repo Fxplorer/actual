@@ -13,7 +13,7 @@ import { type AccountEntity } from 'loot-core/src/types/models';
 
 import { useAccounts } from '../../hooks/useAccounts';
 import { useResponsive } from '../../ResponsiveProvider';
-import { type CSSProperties, theme } from '../../style';
+import { type CSSProperties, theme, styles } from '../../style';
 import { View } from '../common/View';
 
 import { Autocomplete } from './Autocomplete';
@@ -170,6 +170,15 @@ export function AccountItem({
   ...props
 }: AccountItemProps) {
   const { isNarrowWidth } = useResponsive();
+  const narrowStyle = isNarrowWidth
+    ? {
+        ...styles.mobileMenuItem,
+        color: theme.menuItemText,
+        borderRadius: 0,
+        borderTop: `1px solid ${theme.pillBorder}`,
+      }
+    : {};
+
   return (
     <div
       // List each account up to a max
@@ -205,6 +214,7 @@ export function AccountItem({
           padding: 4,
           paddingLeft: 20,
           borderRadius: embedded ? 4 : 0,
+          ...narrowStyle,
         },
       ])}`}
       data-testid={`${item.name}-account-item`}

@@ -25,7 +25,7 @@ import { useAccounts } from '../../hooks/useAccounts';
 import { usePayees } from '../../hooks/usePayees';
 import { SvgAdd } from '../../icons/v1';
 import { useResponsive } from '../../ResponsiveProvider';
-import { type CSSProperties, theme } from '../../style';
+import { type CSSProperties, theme, styles } from '../../style';
 import { Button } from '../common/Button';
 import { View } from '../common/View';
 
@@ -402,6 +402,13 @@ export function CreatePayeeButton({
   ...props
 }: CreatePayeeButtonProps) {
   const { isNarrowWidth } = useResponsive();
+  const narrowStyle = isNarrowWidth
+    ? {
+        ...styles.mobileMenuItem,
+      }
+    : {};
+  const iconSize = isNarrowWidth ? 14 : 8;
+
   return (
     <View
       data-testid="create-payee-button"
@@ -422,6 +429,7 @@ export function CreatePayeeButton({
         ':active': {
           backgroundColor: 'rgba(100, 100, 100, .25)',
         },
+        ...narrowStyle,
         ...style,
       }}
       {...props}
@@ -430,8 +438,8 @@ export function CreatePayeeButton({
         <Icon style={{ marginRight: 5, display: 'inline-block' }} />
       ) : (
         <SvgAdd
-          width={8}
-          height={8}
+          width={iconSize}
+          height={iconSize}
           style={{ marginRight: 5, display: 'inline-block' }}
         />
       )}
@@ -468,6 +476,15 @@ export function PayeeItem({
   ...props
 }: PayeeItemProps) {
   const { isNarrowWidth } = useResponsive();
+  const narrowStyle = isNarrowWidth
+    ? {
+        ...styles.mobileMenuItem,
+        color: theme.menuItemText,
+        borderRadius: 0,
+        borderTop: `1px solid ${theme.pillBorder}`,
+      }
+    : {};
+
   return (
     <div
       // Downshift calls `setTimeout(..., 250)` in the `onMouseMove`
@@ -502,6 +519,7 @@ export function PayeeItem({
           borderRadius: embedded ? 4 : 0,
           padding: 4,
           paddingLeft: 20,
+          ...narrowStyle,
         },
       ])}`}
       data-testid={`${item.name}-payee-item`}
