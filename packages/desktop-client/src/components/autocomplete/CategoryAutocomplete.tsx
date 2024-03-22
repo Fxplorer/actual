@@ -26,6 +26,10 @@ import { View } from '../common/View';
 import { Autocomplete, defaultFilterSuggestion } from './Autocomplete';
 import { ItemHeader } from './ItemHeader';
 
+type CategoryAutocompleteItem = CategoryEntity & {
+  group?: CategoryGroupEntity;
+};
+
 export type CategoryListProps = {
   items: CategoryAutocompleteItem[];
   getItemProps?: (arg: {
@@ -91,10 +95,8 @@ function CategoryList({
                   {renderCategoryItemGroupHeader({
                     title: groupName,
                     style: {
-                      color:
-                        showHiddenItems && item.group?.hidden
-                          ? theme.pageTextSubdued
-                          : theme.menuAutoCompleteTextHeader,
+                      ...(showHiddenItems &&
+                        item.group?.hidden && { color: theme.pageTextSubdued }),
                     },
                   })}
                 </Fragment>
@@ -106,10 +108,8 @@ function CategoryList({
                   highlighted: highlightedIndex === idx,
                   embedded,
                   style: {
-                    color:
-                      showHiddenItems && item.hidden
-                        ? theme.pageTextSubdued
-                        : 'inherit',
+                    ...(showHiddenItems &&
+                      item.hidden && { color: theme.pageTextSubdued }),
                   },
                 })}
               </Fragment>
@@ -121,10 +121,6 @@ function CategoryList({
     </View>
   );
 }
-
-type CategoryAutocompleteItem = CategoryEntity & {
-  group?: CategoryGroupEntity;
-};
 
 type CategoryAutocompleteProps = ComponentProps<
   typeof Autocomplete<CategoryAutocompleteItem>

@@ -37,11 +37,13 @@ import {
 } from './Autocomplete';
 import { ItemHeader } from './ItemHeader';
 
+type PayeeAutocompleteItem = PayeeEntity;
+
 function getPayeeSuggestions(
-  payees: PayeeEntity[],
+  payees: PayeeAutocompleteItem[],
   focusTransferPayees: boolean,
   accounts: AccountEntity[],
-): PayeeEntity[] {
+): PayeeAutocompleteItem[] {
   let activePayees = accounts ? getActivePayees(payees, accounts) : payees;
 
   if (focusTransferPayees && activePayees) {
@@ -68,8 +70,10 @@ function stripNew(value) {
 }
 
 type PayeeListProps = {
-  items: PayeeEntity[];
-  getItemProps: (arg: { item: PayeeEntity }) => ComponentProps<typeof View>;
+  items: PayeeAutocompleteItem[];
+  getItemProps: (arg: {
+    item: PayeeAutocompleteItem;
+  }) => ComponentProps<typeof View>;
   highlightedIndex: number;
   embedded: boolean;
   inputValue: string;
@@ -178,7 +182,7 @@ function PayeeList({
 }
 
 type PayeeAutocompleteProps = ComponentProps<
-  typeof Autocomplete<PayeeEntity>
+  typeof Autocomplete<PayeeAutocompleteItem>
 > & {
   showMakeTransfer?: boolean;
   showManagePayees?: boolean;
@@ -194,7 +198,7 @@ type PayeeAutocompleteProps = ComponentProps<
     props: ComponentPropsWithoutRef<typeof PayeeItem>,
   ) => ReactElement<typeof PayeeItem>;
   accounts?: AccountEntity[];
-  payees?: PayeeEntity[];
+  payees?: PayeeAutocompleteItem[];
 };
 
 export function PayeeAutocomplete({
@@ -228,7 +232,7 @@ export function PayeeAutocomplete({
   const [focusTransferPayees, setFocusTransferPayees] = useState(false);
   const [rawPayee, setRawPayee] = useState('');
   const hasPayeeInput = !!rawPayee;
-  const payeeSuggestions: PayeeEntity[] = useMemo(() => {
+  const payeeSuggestions: PayeeAutocompleteItem[] = useMemo(() => {
     const suggestions = getPayeeSuggestions(
       payees,
       focusTransferPayees,
@@ -265,7 +269,7 @@ export function PayeeAutocomplete({
   const [payeeFieldFocused, setPayeeFieldFocused] = useState(false);
 
   return (
-    <Autocomplete<PayeeEntity>
+    <Autocomplete<PayeeAutocompleteItem>
       key={focusTransferPayees ? 'transfers' : 'all'}
       strict={true}
       embedded={embedded}
@@ -463,7 +467,7 @@ function defaultRenderPayeeItemGroupHeader(
 }
 
 type PayeeItemProps = {
-  item: PayeeEntity;
+  item: PayeeAutocompleteItem;
   className?: string;
   style?: CSSProperties;
   highlighted?: boolean;

@@ -2,7 +2,6 @@
 import React, {
   Fragment,
   type ComponentProps,
-  type ReactNode,
   type ComponentPropsWithoutRef,
   type ReactElement,
 } from 'react';
@@ -20,9 +19,13 @@ import { View } from '../common/View';
 import { Autocomplete } from './Autocomplete';
 import { ItemHeader } from './ItemHeader';
 
+type AccountAutocompleteItem = AccountEntity;
+
 type AccountListProps = {
-  items: AccountEntity[];
-  getItemProps: (arg: { item: AccountEntity }) => ComponentProps<typeof View>;
+  items: AccountAutocompleteItem[];
+  getItemProps: (arg: {
+    item: AccountAutocompleteItem;
+  }) => ComponentProps<typeof View>;
   highlightedIndex: number;
   embedded: boolean;
   renderAccountItemGroupHeader?: (
@@ -90,7 +93,7 @@ function AccountList({
 }
 
 type AccountAutocompleteProps = ComponentProps<
-  typeof Autocomplete<AccountEntity>
+  typeof Autocomplete<AccountAutocompleteItem>
 > & {
   embedded?: boolean;
   includeClosedAccounts?: boolean;
@@ -115,7 +118,7 @@ export function AccountAutocomplete({
 
   //remove closed accounts if needed
   //then sort by closed, then offbudget
-  const accountSuggestions: AccountEntity[] = accounts
+  const accountSuggestions: AccountAutocompleteItem[] = accounts
     .filter(item => {
       return includeClosedAccounts ? item : !item.closed;
     })
@@ -128,7 +131,7 @@ export function AccountAutocomplete({
     });
 
   return (
-    <Autocomplete<AccountEntity>
+    <Autocomplete<AccountAutocompleteItem>
       strict={true}
       highlightFirst={true}
       embedded={embedded}
@@ -156,7 +159,7 @@ function defaultRenderAccountItemGroupHeader(
 }
 
 type AccountItemProps = {
-  item: AccountEntity;
+  item: AccountAutocompleteItem;
   className?: string;
   style?: CSSProperties;
   highlighted?: boolean;
